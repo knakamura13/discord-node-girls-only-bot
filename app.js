@@ -1,13 +1,14 @@
 /**
  *  app.js
  *
- *  Discord bot template.
+ *  Discord bot for the Girls Only server.
  */
 
 /*******************
  * Library Imports *
  *******************/
 
+require("dotenv").config();
 const colors = require("chalk");
 const Discord = require("discord.js");
 
@@ -18,16 +19,24 @@ const Discord = require("discord.js");
 // Config properties
 const CONFIG = {
     // Bot token
-    token: "",
+    token: process.env.DISCORD_BOT_TOKEN,
     // Channel IDs
     channels: {
-        general: "",
+        general: process.env.GIRLS_ONLY_BOT_TESTING,
     },
     // Activity shown when the bot appears 'online'
     defaultActivity: {
         type: "PLAYING", // Activity types: 'PLAYING', 'STREAMING', 'LISTENING', 'WATCHING'
         message: "Animal Crossing",
     },
+};
+
+let activePoll = {
+    creator: "",
+    question: "",
+    options: [],    // [ "first opt", "second", "third option" ]
+    votes: {},      // { 0: 5 (votes), 1: 0 (votes), ... }
+    voters: [],
 };
 
 /*************
@@ -38,26 +47,94 @@ const CONFIG = {
  *  Handle a command from a Discord user.
  *
  *  @param  {Object}    msg         The message object.
- *  @param  {String}    command     The `commandName` part of the message.
+ *  @param  {String}    cmd         The `commandName` part of the message.
  *  @param  {Array}     args        The optional list of arguments from the message.
  *
  *  @note - Discord messages which are treated as commands are expected to look like: "!commandName arg1 arg2 arg3".
  */
 function handleCommand(msg, cmd, args) {
     const channel = msg.channel;
-
     switch (cmd) {
-        case "test":
-            channel.send("1...");
-            channel.send("2...");
-            channel.send("3!");
+        case "poll":
+            const lines = msg.content.split(/\r?\n/),
+                question = lines[0].split(" ").slice(1).join(" "),
+                pollOptions = lines.slice(1);
+
+            if (channel.type === 'dm') {
+                if (activePoll.question) {
+                    // Handle DM messages for admin usage
+                    let res = `Current poll: `;
+                    res += `**${activePoll.question}**\n`;
+                    res += '```';
+                    for (const [key, val] of Object.entries(activePoll.votes)) {
+                        res += `${key}: \t${val}\n`
+                    }
+                    res += '```';
+                    msg.reply(res);
+                } else {
+                    msg.reply(`There aren't any active polls.`);
+                }
+                break;
+            }
+
+            if (pollOptions.length < 1) {
+                // Show command usage when no parameters are given
+                channel.send(`Please provide between 1 to 25 options. Options are separated by new lines. Example: \n!poll question\noption 1\noption 2\netc. ...`);
+                break;
+            } else {
+                // Replace the active poll
+                activePoll = {
+                    creator:    msg.author.username,
+                    question:   question,
+                    options:    pollOptions,
+                    votes:      {},
+                    voters:     [],
+                }
+
+                // Notify the channel about the new poll and its options
+                let newPollMsg = `New poll created: **${question}**\n`;
+                for (let i in pollOptions) {
+                    let opt = pollOptions[i];
+                    activePoll.votes[opt] = 0;
+                    newPollMsg += `${Number(i) + 1}: \t${opt}\n`;
+                }
+                channel.send(newPollMsg);
+            }
+            break;
+        case "vote":
+            // Check if this user has already voted on this poll
+            const voter = msg.author.username;
+            if (activePoll.voters.includes(voter)) {
+                msg.reply(`You already voted!`);
+            }
+
+            let choice = -1;
+
+            try {
+                // Attempt to convert the first argument to an index of the options array
+                choice = Math.floor(Number(args[0]) - 1);
+            } catch (err) { }
+
+            let chosenOption = activePoll.options[choice];
+
+            // Show command usage on error
+            if (typeof choice !== 'number' || choice < 0 || choice > activePoll.options.length - 1 || !chosenOption) {
+                channel.send(`Please choose a number between 1 and ${activePoll.options.length}`)
+                break;
+            }
+
+            // Record the username to prevent duplicate votes
+            activePoll.voters.push(voter)
+
+            // Update the vote tallies
+            if (activePoll.votes[chosenOption])
+                activePoll.votes[chosenOption] += 1;
+            else 
+                activePoll.votes[chosenOption] = 1;
+
+            console.log(`Vote received for: "${chosenOption}"`);
             break;
         default:
-            msg.reply(
-                `You used the command '!${cmd}' with these arguments: [${args.join(
-                    ", "
-                )}]`
-            );
             break;
     }
 }
@@ -86,6 +163,7 @@ const client = new Discord.Client();
 
 // Handle bot connected to the server
 client.on("ready", () => {
+    console.clear();
     console.log(colors.green(`Logged in as: ${client.user.tag}`));
 
     // Set the bot's activity
@@ -94,14 +172,6 @@ client.on("ready", () => {
             type: CONFIG.defaultActivity.type,
         })
         .then();
-
-    // Join the 'general' channel
-    client.channels.fetch(CONFIG.channels.general).then((channel) => {
-        channel.send("Discord bot has joined the channel");
-        console.log(
-            colors.yellow(`Joined a channel: ${colors.yellow(channel.name)}`)
-        );
-    });
 });
 
 // Handle message from user
@@ -116,11 +186,6 @@ client.on("message", (msg) => {
 
         handleCommand(msg, cmd, args);
         return;
-    }
-
-    // Handle messages that aren't commands
-    if (msg.content === "ping") {
-        msg.reply("pong");
     }
 });
 
