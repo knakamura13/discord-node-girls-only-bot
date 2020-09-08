@@ -86,7 +86,7 @@ function handleCommand(msg, cmd, args) {
       };
 
       // Notify the channel about the new poll and its options
-      showNewPollCreated(channel, pollOptions);
+      showNewPollCreated(channel, question, pollOptions);
       break;
     case "vote":
       // Check if this user has already voted on this poll
