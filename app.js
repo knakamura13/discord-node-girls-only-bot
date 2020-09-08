@@ -91,7 +91,10 @@ function handleCommand(msg, cmd, args) {
     case "vote":
       // Check if this user has already voted on this poll
       const voter = msg.author.username;
-      if (activePoll.voters.includes(voter)) msg.reply(`You already voted!`);
+      if (activePoll.voters.includes(voter)) {
+        msg.reply(`You already voted!`);
+        break;
+      }
 
       // Record the poll option that was selected by the user. i.e. choiceIndex = 2 for "!vote 2"
       let choiceIndex;
@@ -110,7 +113,7 @@ function handleCommand(msg, cmd, args) {
       // Show command usage on error
       if (typeof choiceIndex !== "number" || !chosenOption) {
         channel.send(
-          `Please choose a number between 1 and ${activePoll.options.length}`
+          `Please choose a number between 1 and ${activePoll.options.length}. i.e. !vote 2`
         );
         break;
       }
@@ -157,20 +160,20 @@ function showNewPollCreated(channel, question, pollOptions) {
  *  @param  {Object}     msg     The message object.
  */
 function logMessageWithColors(msg) {
-    const d = new Date(msg.createdTimestamp),
-        h = d.getHours(),
-        m = d.getMinutes(),
-        s = d.getSeconds(),
-        time = colors.grey(`[${h}:${m}:${s}]`),
-        author = colors.cyan(`@${msg.author.username}`);
+  const d = new Date(msg.createdTimestamp),
+    h = d.getHours(),
+    m = d.getMinutes(),
+    s = d.getSeconds(),
+    time = colors.grey(`[${h}:${m}:${s}]`),
+    author = colors.cyan(`@${msg.author.username}`);
 
-    console.log(`${time} ${author}: ${msg.content}`);
+  console.log(`${time} ${author}: ${msg.content}`);
 
-    // Extract attachments from all messages
-    for (let [key, val] of msg.attachments) {
-        let { name, url } = val;
-        console.log(`${name}\n${url}`);
-    }
+  // Extract attachments from all messages
+  for (let [key, val] of msg.attachments) {
+    let { name, url } = val;
+    console.log(`${name}\n${url}`);
+  }
 }
 
 /**************************
