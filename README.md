@@ -1,6 +1,6 @@
-# Discord Node Chat Bot Template
+# Discord Node Girls Only Bot
 
-A simple Discord bot made with Node.js
+A simple Discord bot made with Node.js for the Girls Only server.
 
 ## Prerequisites
 
