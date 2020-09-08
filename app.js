@@ -60,7 +60,7 @@ function handleCommand(msg, cmd, args) {
       if (channel.type === "dm") {
         if (activePoll.question) {
           // Notify the creator that the poll was created
-          respondWithCurrentPollStatus(msg);
+          respondWithCurrentPollStatus(msg, question);
         } else {
           msg.reply(
             `There aren't any active polls. Use the !poll command in any channel to start one.`
@@ -129,7 +129,7 @@ function handleCommand(msg, cmd, args) {
   }
 }
 
-function respondWithCurrentPollStatus(msg) {
+function respondWithCurrentPollStatus(msg, question) {
   let res = `Current poll: `;
   res += `**${activePoll.question}**\n`;
   res += "```";
@@ -141,7 +141,7 @@ function respondWithCurrentPollStatus(msg) {
   msg.reply(res);
 }
 
-function showNewPollCreated(channel) {
+function showNewPollCreated(channel, question) {
   let newPollMsg = `New poll created: **${question}**\n`;
   for (let i in pollOptions) {
     let opt = pollOptions[i];
