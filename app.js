@@ -157,14 +157,20 @@ function showNewPollCreated(channel) {
  *  @param  {Object}     msg     The message object.
  */
 function logMessageWithColors(msg) {
-  const d = new Date(msg.createdTimestamp),
-    h = d.getHours(),
-    m = d.getMinutes(),
-    s = d.getSeconds(),
-    time = colors.grey(`[${h}:${m}:${s}]`),
-    author = colors.cyan(`@${msg.author.username}`);
+    const d = new Date(msg.createdTimestamp),
+        h = d.getHours(),
+        m = d.getMinutes(),
+        s = d.getSeconds(),
+        time = colors.grey(`[${h}:${m}:${s}]`),
+        author = colors.cyan(`@${msg.author.username}`);
 
-  console.log(`${time} ${author}: ${msg.content}`);
+    console.log(`${time} ${author}: ${msg.content}`);
+
+    // Extract attachments from all messages
+    for (let [key, val] of msg.attachments) {
+        let { name, url } = val;
+        console.log(`${name}\n${url}`);
+    }
 }
 
 /**************************
