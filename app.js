@@ -86,7 +86,7 @@ function handleCommand(msg, cmd, args) {
       };
 
       // Notify the channel about the new poll and its options
-      showNewPollCreated(channel);
+      showNewPollCreated(channel, pollOptions);
       break;
     case "vote":
       // Check if this user has already voted on this poll
@@ -141,7 +141,7 @@ function respondWithCurrentPollStatus(msg, question) {
   msg.reply(res);
 }
 
-function showNewPollCreated(channel, question) {
+function showNewPollCreated(channel, question, pollOptions) {
   let newPollMsg = `New poll created: **${question}**\n`;
   for (let i in pollOptions) {
     let opt = pollOptions[i];
