@@ -19,18 +19,13 @@ Add your bot to a server
  - Create an invite link for your bot ([Instructions](https://discordjs.guide/preparations/adding-your-bot-to-servers.html))
  - Send your invite link to the server owner and have them grant access to the bot
 
-Add your bot to the #general channel
- - Ask the server owner for the channel ID of the `#general` channel ([Instructions for getting the channel ID](https://github.com/5andr0/PogoLocationFeeder/issues/64))
- - Set the `general` property in the `CONFIG` object
+Note that your bot will automatically listen in on *all* channels if you have given it admin privelages.
 
 *This is the CONFIG object mentioned above:*
 
     // Config properties
     const CONFIG = {
         token: "TOKEN GOES HERE", // Note: use .env files with the dotenv package to protect your secrets.
-        channels: {
-            general: "GENERAL CHANNEL ID GOES HERE",
-        },
     };
 
 ## Dependencies
