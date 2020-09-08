@@ -27,7 +27,7 @@ Add your bot to the #general channel
 
     // Config properties
     const CONFIG = {
-        token: "TOKEN GOES HERE",
+        token: "TOKEN GOES HERE", // Note: use .env files with the dotenv package to protect your secrets.
         channels: {
             general: "GENERAL CHANNEL ID GOES HERE",
         },
@@ -36,5 +36,4 @@ Add your bot to the #general channel
 ## Dependencies
 
     "chalk": "^4.1.0",
-    "discord.js": "^12.3.1",
-    "node": "^14.8.0"
+    "discord.js": "^12.3.1"
