@@ -52,12 +52,16 @@ function handleCommand(msg, cmd, args) {
   const channel = msg.channel;
   switch (cmd) {
     case "poll":
+      if (msg.author.username !== "Kmight" && msg.author.username !== "Squishy Life") {
+        msg.reply("Sorry, only @Kmight#6745 can use that command here.");
+        break;
+      }
       const lines = msg.content.split(/\r?\n/),
         question = lines[0].split(" ").slice(1).join(" "),
         pollOptions = lines.slice(1);
 
       // Handle direct messages
-      if (channel.type === "dm" && msg.author.username === "Kmight") {
+      if (channel.type === "dm") {
         if (activePoll.question) {
           // Notify the creator that the poll was created
           respondWithCurrentPollStatus(msg, question);
@@ -89,6 +93,9 @@ function handleCommand(msg, cmd, args) {
       showNewPollCreated(channel, question, pollOptions);
       break;
     case "vote":
+      if (!activePoll.question) {
+        msg.reply(`There aren't any active polls. Ask @Kmight#6745 to create a poll for you.`);
+      }
       // Check if this user has already voted on this poll
       const voter = msg.author.username;
       if (activePoll.voters.includes(voter)) {
