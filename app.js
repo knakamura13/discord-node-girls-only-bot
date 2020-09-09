@@ -57,7 +57,7 @@ function handleCommand(msg, cmd, args) {
         pollOptions = lines.slice(1);
 
       // Handle direct messages
-      if (channel.type === "dm") {
+      if (channel.type === "dm" && msg.author.username === "Kmight") {
         if (activePoll.question) {
           // Notify the creator that the poll was created
           respondWithCurrentPollStatus(msg, question);
